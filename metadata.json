@@ -1,0 +1,5 @@
+{
+  "name": "Worker Ledger - BuildLog Pro",
+  "description": "A worker ledger application for tracking attendance, earnings, and payments.",
+  "requestFramePermissions": []
+}
