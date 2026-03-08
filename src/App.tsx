@@ -12,69 +12,40 @@ import { PaymentsTable } from './components/PaymentsTable';
 import { Summary } from './components/Summary';
 import { Dashboard } from './components/Dashboard';
 import { AttendanceRecord, PaymentRecord, Worker, AttendanceStatus } from './types';
-import * as db from './lib/supabase';
+import * as storage from './lib/storage';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'worker'>('dashboard');
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'attendance' | 'payments'>('attendance');
-  const [loading, setLoading] = useState(true);
   
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [attendanceLog, setAttendanceLog] = useState<Record<string, AttendanceRecord[]>>({});
-  const [payments, setPayments] = useState<Record<string, PaymentRecord[]>>({});
+  const [workers, setWorkers] = useState<Worker[]>(() => {
+    const saved = storage.getWorkers();
+    return saved.map(w => ({ ...w, currentStatus: null }));
+  });
 
-  // Load all data from database on mount
+  const [attendanceLog, setAttendanceLog] = useState<Record<string, AttendanceRecord[]>>(() => {
+    return storage.getAttendanceLog();
+  });
+
+  const [payments, setPayments] = useState<Record<string, PaymentRecord[]>>(() => {
+    return storage.getPayments();
+  });
+
+  // Save workers whenever they change
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const workersData = await db.getWorkers();
-        
-        // Convert database workers to app format
-        const formattedWorkers: Worker[] = workersData.map((w: any) => ({
-          id: w.id,
-          name: w.name,
-          role: w.role,
-          dailyRate: w.daily_rate,
-          currentStatus: null
-        }));
-        
-        setWorkers(formattedWorkers);
+    storage.saveWorkers(workers);
+  }, [workers]);
 
-        // Load attendance and payments for each worker
-        const attendanceData: Record<string, AttendanceRecord[]> = {};
-        const paymentsData: Record<string, PaymentRecord[]> = {};
+  // Save attendance log whenever it changes
+  useEffect(() => {
+    storage.saveAttendanceLog(attendanceLog);
+  }, [attendanceLog]);
 
-        for (const worker of formattedWorkers) {
-          const attRecords = await db.getAttendanceByWorker(worker.id);
-          attendanceData[worker.id] = attRecords.map((a: any) => ({
-            id: a.id,
-            date: a.date,
-            status: a.status,
-            pay: a.pay
-          }));
-
-          const paymentRecords = await db.getPaymentsByWorker(worker.id);
-          paymentsData[worker.id] = paymentRecords.map((p: any) => ({
-            id: p.id,
-            date: p.date,
-            description: p.description,
-            amount: p.amount
-          }));
-        }
-
-        setAttendanceLog(attendanceData);
-        setPayments(paymentsData);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
+  // Save payments whenever they change
+  useEffect(() => {
+    storage.savePayments(payments);
+  }, [payments]);
 
   const handleUpdateStatus = (workerId: string, status: AttendanceStatus | null) => {
     setWorkers(workers.map(w => w.id === workerId ? { ...w, currentStatus: status } : w));
@@ -93,70 +64,41 @@ export default function App() {
     setCurrentView('worker');
   };
 
-  const handleAddWorker = async (workerData: Omit<Worker, 'id' | 'currentStatus'>) => {
-    try {
-      const newWorkerDb = await db.addWorker(workerData.name, workerData.role, workerData.dailyRate);
-      const newWorker: Worker = {
-        id: newWorkerDb.id,
-        name: newWorkerDb.name,
-        role: newWorkerDb.role,
-        dailyRate: newWorkerDb.daily_rate,
-        currentStatus: null
-      };
-      setWorkers([...workers, newWorker]);
-      setAttendanceLog({ ...attendanceLog, [newWorker.id]: [] });
-      setPayments({ ...payments, [newWorker.id]: [] });
-    } catch (error) {
-      console.error('Error adding worker:', error);
-      alert('Failed to add worker');
-    }
+  const handleAddWorker = (workerData: Omit<Worker, 'id' | 'currentStatus'>) => {
+    const newWorker: Worker = {
+      ...workerData,
+      id: Date.now().toString(),
+      currentStatus: null
+    };
+    setWorkers([...workers, newWorker]);
+    setAttendanceLog({ ...attendanceLog, [newWorker.id]: [] });
+    setPayments({ ...payments, [newWorker.id]: [] });
   };
 
-  const handleEditWorker = async (workerId: string, updates: Partial<Worker>) => {
-    try {
-      const worker = workers.find(w => w.id === workerId);
-      if (!worker) return;
-
-      await db.updateWorker(
-        workerId,
-        updates.name || worker.name,
-        updates.role || worker.role,
-        updates.dailyRate || worker.dailyRate
-      );
-
-      setWorkers(workers.map(w => w.id === workerId ? { ...w, ...updates } : w));
-    } catch (error) {
-      console.error('Error editing worker:', error);
-      alert('Failed to update worker');
-    }
+  const handleEditWorker = (workerId: string, updates: Partial<Worker>) => {
+    setWorkers(workers.map(w => w.id === workerId ? { ...w, ...updates } : w));
   };
 
-  const handleDeleteWorker = async (workerId: string) => {
-    try {
-      await db.deleteWorker(workerId);
-      setWorkers(workers.filter(w => w.id !== workerId));
-      const newAttendanceLog = { ...attendanceLog };
-      const newPayments = { ...payments };
-      delete newAttendanceLog[workerId];
-      delete newPayments[workerId];
-      setAttendanceLog(newAttendanceLog);
-      setPayments(newPayments);
-      setCurrentView('dashboard');
-      setSelectedWorkerId(null);
-    } catch (error) {
-      console.error('Error deleting worker:', error);
-      alert('Failed to delete worker');
-    }
+  const handleDeleteWorker = (workerId: string) => {
+    setWorkers(workers.filter(w => w.id !== workerId));
+    const newAttendanceLog = { ...attendanceLog };
+    const newPayments = { ...payments };
+    delete newAttendanceLog[workerId];
+    delete newPayments[workerId];
+    setAttendanceLog(newAttendanceLog);
+    setPayments(newPayments);
+    setCurrentView('dashboard');
+    setSelectedWorkerId(null);
   };
 
   const selectedWorker = workers.find(w => w.id === selectedWorkerId);
   const workerAttendance = selectedWorkerId ? (attendanceLog[selectedWorkerId] || []) : [];
   const workerPayments = selectedWorkerId ? (payments[selectedWorkerId] || []) : [];
 
-  const handleMarkAttendance = async (status: AttendanceStatus, dateStr?: string) => {
+  const handleMarkAttendance = (status: AttendanceStatus, dateStr?: string) => {
     if (!selectedWorkerId || !selectedWorker) return;
     
-    const dateToUse = dateStr || new Date().toISOString().split('T')[0];
+    const dateToUse = dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
     if (workerAttendance.some(log => log.date === dateToUse)) {
       alert(`Attendance already marked for ${dateToUse}!`);
@@ -167,65 +109,37 @@ export default function App() {
     if (status === 'Present') pay = selectedWorker.dailyRate;
     if (status === 'Half day') pay = selectedWorker.dailyRate / 2;
 
-    try {
-      const newRecord = await db.addAttendance(selectedWorkerId, dateToUse, status, pay);
-      
-      const newAttendanceRecord: AttendanceRecord = {
-        id: newRecord.id,
-        date: newRecord.date,
-        status: newRecord.status,
-        pay: newRecord.pay
-      };
+    const newRecord: AttendanceRecord = {
+      id: Date.now().toString(),
+      date: dateToUse,
+      status,
+      pay
+    };
 
-      setAttendanceLog({
-        ...attendanceLog,
-        [selectedWorkerId]: [newAttendanceRecord, ...workerAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      });
-      
-      // Also update current status on dashboard if the date is today
-      const today = new Date().toISOString().split('T')[0];
-      if (dateToUse === today) {
-        handleUpdateStatus(selectedWorkerId, status);
-      }
-    } catch (error) {
-      console.error('Error marking attendance:', error);
-      alert('Failed to mark attendance');
+    setAttendanceLog({
+      ...attendanceLog,
+      [selectedWorkerId]: [newRecord, ...workerAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    });
+    
+    // Also update current status on dashboard if the date is today
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (dateToUse === today) {
+      handleUpdateStatus(selectedWorkerId, status);
     }
   };
 
-  const handleEditAttendance = async (workerId: string, recordId: string, updates: Partial<AttendanceRecord>) => {
-    try {
-      const currentRecord = attendanceLog[workerId].find(log => log.id === recordId);
-      if (!currentRecord) return;
-
-      await db.updateAttendance(
-        recordId,
-        updates.date || currentRecord.date,
-        updates.status || currentRecord.status,
-        updates.pay !== undefined ? updates.pay : currentRecord.pay
-      );
-
-      setAttendanceLog({
-        ...attendanceLog,
-        [workerId]: attendanceLog[workerId].map(log => log.id === recordId ? { ...log, ...updates } : log)
-      });
-    } catch (error) {
-      console.error('Error editing attendance:', error);
-      alert('Failed to update attendance');
-    }
+  const handleEditAttendance = (workerId: string, recordId: string, updates: Partial<AttendanceRecord>) => {
+    setAttendanceLog({
+      ...attendanceLog,
+      [workerId]: attendanceLog[workerId].map(log => log.id === recordId ? { ...log, ...updates } : log)
+    });
   };
 
-  const handleDeleteAttendance = async (workerId: string, recordId: string) => {
-    try {
-      await db.deleteAttendance(recordId);
-      setAttendanceLog({
-        ...attendanceLog,
-        [workerId]: attendanceLog[workerId].filter(log => log.id !== recordId)
-      });
-    } catch (error) {
-      console.error('Error deleting attendance:', error);
-      alert('Failed to delete attendance');
-    }
+  const handleDeleteAttendance = (workerId: string, recordId: string) => {
+    setAttendanceLog({
+      ...attendanceLog,
+      [workerId]: attendanceLog[workerId].filter(log => log.id !== recordId)
+    });
   };
 
   const handleEditPayment = (workerId: string, recordId: string, updates: Partial<PaymentRecord>) => {
