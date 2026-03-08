@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { WorkerInfo } from './components/WorkerInfo';
 import { Tabs } from './components/Tabs';
@@ -12,34 +12,43 @@ import { PaymentsTable } from './components/PaymentsTable';
 import { Summary } from './components/Summary';
 import { Dashboard } from './components/Dashboard';
 import { AttendanceRecord, PaymentRecord, Worker, AttendanceStatus } from './types';
+import * as storage from './lib/storage';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'worker'>('dashboard');
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'attendance' | 'payments'>('attendance');
   
-  const [workers, setWorkers] = useState<Worker[]>([
-    { id: '1', name: 'Ramesh Kumar', role: 'Mistri', dailyRate: 850, currentStatus: 'Present' },
-    { id: '2', name: 'Sunil Yadav', role: 'Labour', dailyRate: 650, currentStatus: 'Half day' },
-    { id: '3', name: 'Pooja Devi', role: 'Helper', dailyRate: 450, currentStatus: 'Absent' },
-    { id: '4', name: 'Abdul Khan', role: 'Labour', dailyRate: 650, currentStatus: null },
-  ]);
-
-  const [attendanceLog, setAttendanceLog] = useState<Record<string, AttendanceRecord[]>>({
-    '1': [
-      { id: '1', date: 'Oct 27, 2023', status: 'Present', pay: 850 },
-      { id: '2', date: 'Oct 26, 2023', status: 'Absent', pay: 0 },
-    ],
-    '2': [
-      { id: '3', date: 'Oct 27, 2023', status: 'Half day', pay: 325 },
-    ]
+  const [workers, setWorkers] = useState<Worker[]>(() => {
+    const saved = storage.getWorkers();
+    return saved.map(w => ({ ...w, currentStatus: null }));
   });
 
-  const [payments, setPayments] = useState<Record<string, PaymentRecord[]>>({
-    '1': [
-      { id: '1', date: 'Oct 26, 2023', description: 'Weekly Advance', amount: 1000 },
-    ]
+  const [attendanceLog, setAttendanceLog] = useState<Record<string, AttendanceRecord[]>>(() => {
+    return storage.getAttendanceLog();
   });
+
+  const [payments, setPayments] = useState<Record<string, PaymentRecord[]>>(() => {
+    return storage.getPayments();
+  });
+
+  // Save workers whenever they change
+  useEffect(() => {
+    console.log("[v0] Workers changed, saving to localStorage:", workers);
+    storage.saveWorkers(workers);
+  }, [workers]);
+
+  // Save attendance log whenever it changes
+  useEffect(() => {
+    console.log("[v0] Attendance log changed, saving to localStorage:", attendanceLog);
+    storage.saveAttendanceLog(attendanceLog);
+  }, [attendanceLog]);
+
+  // Save payments whenever they change
+  useEffect(() => {
+    console.log("[v0] Payments changed, saving to localStorage:", payments);
+    storage.savePayments(payments);
+  }, [payments]);
 
   const handleUpdateStatus = (workerId: string, status: AttendanceStatus | null) => {
     setWorkers(workers.map(w => w.id === workerId ? { ...w, currentStatus: status } : w));
@@ -65,6 +74,8 @@ export default function App() {
       currentStatus: null
     };
     setWorkers([...workers, newWorker]);
+    setAttendanceLog({ ...attendanceLog, [newWorker.id]: [] });
+    setPayments({ ...payments, [newWorker.id]: [] });
   };
 
   const handleEditWorker = (workerId: string, updates: Partial<Worker>) => {
@@ -73,18 +84,27 @@ export default function App() {
 
   const handleDeleteWorker = (workerId: string) => {
     setWorkers(workers.filter(w => w.id !== workerId));
+    const newAttendanceLog = { ...attendanceLog };
+    const newPayments = { ...payments };
+    delete newAttendanceLog[workerId];
+    delete newPayments[workerId];
+    setAttendanceLog(newAttendanceLog);
+    setPayments(newPayments);
     setCurrentView('dashboard');
     setSelectedWorkerId(null);
   };
 
   const selectedWorker = workers.find(w => w.id === selectedWorkerId);
-  const workerAttendance = selectedWorkerId ? (attendanceLog[selectedWorkerId] || []) : [];
-  const workerPayments = selectedWorkerId ? (payments[selectedWorkerId] || []) : [];
+  const workerAttendance = selectedWorkerId && attendanceLog[selectedWorkerId] ? attendanceLog[selectedWorkerId] : [];
+  const workerPayments = selectedWorkerId && payments[selectedWorkerId] ? payments[selectedWorkerId] : [];
 
   const handleMarkAttendance = (status: AttendanceStatus, dateStr?: string) => {
     if (!selectedWorkerId || !selectedWorker) return;
     
     const dateToUse = dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    console.log("[v0] Marking attendance - WorkerId:", selectedWorkerId, "Date:", dateToUse, "Status:", status);
+    console.log("[v0] Current attendance for worker:", workerAttendance);
     
     if (workerAttendance.some(log => log.date === dateToUse)) {
       alert(`Attendance already marked for ${dateToUse}!`);
@@ -102,10 +122,15 @@ export default function App() {
       pay
     };
 
-    setAttendanceLog({
+    console.log("[v0] New record created:", newRecord);
+    
+    const updatedLog = {
       ...attendanceLog,
       [selectedWorkerId]: [newRecord, ...workerAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    });
+    };
+    
+    console.log("[v0] Updated attendance log:", updatedLog);
+    setAttendanceLog(updatedLog);
     
     // Also update current status on dashboard if the date is today
     const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
