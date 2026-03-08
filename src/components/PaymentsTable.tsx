@@ -66,42 +66,48 @@ export function PaymentsTable({ payments, onAddPayment, onEdit, onDelete }: Paym
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-primary/10 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-primary/5 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
-          <h3 className="font-bold text-slate-700 dark:text-slate-300">Payments Made</h3>
+      <div className="bg-white dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden hover:shadow-md transition-all duration-200">
+        <div className="p-5 md:p-6 border-b border-border-light dark:border-border-dark bg-slate-50/60 dark:bg-slate-900/20 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
+          <div>
+            <h3 className="font-bold text-slate-900 dark:text-white text-lg">Payments Made</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Track payment transactions</p>
+          </div>
           <button 
             onClick={() => setShowModal(true)}
-            className="text-primary text-xs font-bold flex items-center gap-1 hover:underline"
+            className="text-primary text-xs md:text-sm font-bold flex items-center gap-2 hover:bg-primary/10 px-3 py-2 rounded-lg transition-colors"
           >
-            <Banknote size={14} />
+            <Banknote size={16} />
             Add Payment
           </button>
         </div>
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left whitespace-nowrap">
-            <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+            <thead className="bg-slate-50 dark:bg-slate-900/30 text-slate-600 dark:text-slate-400 text-xs uppercase tracking-widest border-b border-border-light dark:border-border-dark">
               <tr>
-                <th className="px-4 md:px-6 py-4 font-semibold">Date</th>
-                <th className="px-4 md:px-6 py-4 font-semibold">Description</th>
-                <th className="px-4 md:px-6 py-4 font-semibold text-right">Amount</th>
+                <th className="px-5 md:px-6 py-4 font-semibold">Date</th>
+                <th className="px-5 md:px-6 py-4 font-semibold">Description</th>
+                <th className="px-5 md:px-6 py-4 font-semibold text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-primary/5">
+            <tbody className="divide-y divide-border-light dark:divide-border-dark">
               {payments.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 md:px-6 py-8 text-center text-slate-500">No payment records found.</td>
+                  <td colSpan={3} className="px-5 md:px-6 py-12 text-center text-slate-400 dark:text-slate-500">
+                    <p className="font-medium">No payment records yet</p>
+                    <p className="text-sm mt-1">Add payments to track transactions</p>
+                  </td>
                 </tr>
               ) : (
                 payments.map((payment) => (
                   <tr 
                     key={payment.id} 
-                    className="hover:bg-primary/5 transition-colors cursor-pointer"
+                    className="hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-200 cursor-pointer"
                     onDoubleClick={() => handleRowClick(payment)}
                     title="Double click to edit"
                   >
-                    <td className="px-4 md:px-6 py-4 text-sm">{payment.date}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm italic text-slate-500">{payment.description}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm font-bold text-right text-red-500">-₹{payment.amount.toFixed(2)}</td>
+                    <td className="px-5 md:px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-300">{payment.date}</td>
+                    <td className="px-5 md:px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{payment.description}</td>
+                    <td className="px-5 md:px-6 py-4 text-sm font-bold text-right text-red-600 dark:text-red-400">-₹{payment.amount.toFixed(2)}</td>
                   </tr>
                 ))
               )}
@@ -111,8 +117,8 @@ export function PaymentsTable({ payments, onAddPayment, onEdit, onDelete }: Paym
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Add Payment</h3>
               <button onClick={() => setShowModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
@@ -165,8 +171,8 @@ export function PaymentsTable({ payments, onAddPayment, onEdit, onDelete }: Paym
       )}
 
       {editingPayment && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Edit Payment</h3>
               <button onClick={() => setEditingPayment(null)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">

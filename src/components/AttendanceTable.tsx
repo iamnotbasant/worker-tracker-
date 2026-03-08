@@ -49,48 +49,52 @@ export function AttendanceTable({ logs, onEdit, onDelete }: AttendanceTableProps
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-primary/10 shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-primary/5 bg-slate-50/50 dark:bg-slate-800/30">
-        <h3 className="font-bold text-slate-700 dark:text-slate-300">Daily Attendance Log</h3>
+      <div className="bg-white dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden hover:shadow-md transition-all duration-200">
+      <div className="p-5 md:p-6 border-b border-border-light dark:border-border-dark bg-slate-50/60 dark:bg-slate-900/20">
+        <h3 className="font-bold text-slate-900 dark:text-white text-lg">Attendance Log</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Track and manage daily attendance records</p>
       </div>
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left whitespace-nowrap">
-          <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+          <thead className="bg-slate-50 dark:bg-slate-900/30 text-slate-600 dark:text-slate-400 text-xs uppercase tracking-widest border-b border-border-light dark:border-border-dark">
             <tr>
-              <th className="px-4 md:px-6 py-4 font-semibold">Date</th>
-              <th className="px-4 md:px-6 py-4 font-semibold">Attendance Status</th>
-              <th className="px-4 md:px-6 py-4 font-semibold text-right">Daily Pay</th>
+              <th className="px-5 md:px-6 py-4 font-semibold">Date</th>
+              <th className="px-5 md:px-6 py-4 font-semibold">Status</th>
+              <th className="px-5 md:px-6 py-4 font-semibold text-right">Daily Pay</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-primary/5">
+          <tbody className="divide-y divide-border-light dark:divide-border-dark">
             {logs.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-4 md:px-6 py-8 text-center text-slate-500">No attendance records found.</td>
+                <td colSpan={3} className="px-5 md:px-6 py-12 text-center text-slate-400 dark:text-slate-500">
+                  <p className="font-medium">No attendance records yet</p>
+                  <p className="text-sm mt-1">Start tracking attendance to see records here</p>
+                </td>
               </tr>
             ) : (
               logs.map((log) => (
                 <tr 
                   key={log.id} 
-                  className="hover:bg-primary/5 transition-colors cursor-pointer"
+                  className="hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-200 cursor-pointer"
                   onDoubleClick={() => handleRowClick(log)}
                   title="Double click to edit"
                 >
-                  <td className="px-4 md:px-6 py-4 text-sm">{log.date}</td>
-                  <td className="px-4 md:px-6 py-4">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
+                  <td className="px-5 md:px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-300">{log.date}</td>
+                  <td className="px-5 md:px-6 py-4">
+                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${
                       log.status === 'Present' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                      log.status === 'Half day' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
+                      log.status === 'Half day' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
                       'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                     }`}>
                       <span className={`size-2 rounded-full ${
                         log.status === 'Present' ? 'bg-green-500' :
-                        log.status === 'Half day' ? 'bg-orange-500' :
+                        log.status === 'Half day' ? 'bg-amber-500' :
                         'bg-red-500'
                       }`}></span>
                       {log.status}
                     </div>
                   </td>
-                  <td className="px-4 md:px-6 py-4 text-sm font-semibold text-right text-slate-700 dark:text-slate-200">
+                  <td className="px-5 md:px-6 py-4 text-sm font-bold text-right text-slate-900 dark:text-white">
                     ₹{log.pay.toFixed(2)}
                   </td>
                 </tr>
@@ -101,8 +105,8 @@ export function AttendanceTable({ logs, onEdit, onDelete }: AttendanceTableProps
       </div>
       
       {editingLog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Edit Attendance</h3>
               <button onClick={() => setEditingLog(null)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">

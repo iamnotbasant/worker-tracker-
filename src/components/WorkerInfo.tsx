@@ -69,21 +69,23 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-800/50 p-4 md:p-6 rounded-2xl border border-slate-200/60 dark:border-primary/10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
-        <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
-          <div className="size-12 md:size-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shrink-0 shadow-sm">
-            <User size={24} className="md:w-7 md:h-7" />
+      <div className="bg-white dark:bg-surface-dark p-5 md:p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-5 md:gap-6 hover:shadow-md transition-all duration-200">
+        <div className="flex items-center gap-4 md:gap-5 w-full md:w-auto">
+          <div className="size-14 md:size-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary border border-primary/20 shrink-0 shadow-sm">
+            <User size={28} className="md:w-8 md:h-8" />
           </div>
           <div className="flex-1">
-            <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2 dark:text-white">
-              {worker.name}
-              <button onClick={() => setShowEditModal(true)} className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Edit Worker">
-                <Edit2 size={16} />
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl md:text-2xl font-bold dark:text-white">
+                {worker.name}
+              </h1>
+              <button onClick={() => setShowEditModal(true)} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Edit Worker">
+                <Edit2 size={18} />
               </button>
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
+            </div>
+            <div className="flex flex-wrap items-center gap-3 mt-2">
               {worker.role && (
-                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide ${
+                <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
                   worker.role === 'Mistri' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
                   worker.role === 'Labour' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
                   'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
@@ -91,33 +93,33 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
                   {worker.role}
                 </span>
               )}
-              <span className="text-slate-500 dark:text-slate-400 text-xs md:text-sm font-medium flex items-center gap-1">
-                ₹{worker.dailyRate} / Day
+              <span className="text-slate-600 dark:text-slate-400 text-xs md:text-sm font-semibold flex items-center gap-1">
+                <span className="text-primary font-bold">₹{worker.dailyRate}</span>/Day
               </span>
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
+        <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
           <button 
             onClick={() => setShowPaymentModal(true)}
-            className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors active:scale-95 border border-slate-200 dark:border-slate-700"
+            className="bg-surface-light dark:bg-slate-900 text-slate-700 dark:text-slate-200 px-4 md:px-5 py-2.5 md:py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 active:scale-95 border border-border-light dark:border-border-dark"
           >
             <Banknote size={18} />
-            Add Payment
+            <span className="hidden md:inline">Payment</span>
           </button>
           <button 
             onClick={() => setShowAttendanceModal(true)}
-            className="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors active:scale-95"
+            className="bg-primary text-white px-4 md:px-5 py-2.5 md:py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/25 hover:shadow-lg hover:shadow-primary/35 transition-all duration-200 active:scale-95"
           >
             <Plus size={18} />
-            Mark Attendance
+            <span className="hidden md:inline">Attendance</span>
           </button>
         </div>
       </div>
 
       {showAttendanceModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Mark Attendance</h3>
               <button onClick={() => setShowAttendanceModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
@@ -158,8 +160,8 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
       )}
 
       {showPaymentModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Add Payment</h3>
               <button onClick={() => setShowPaymentModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
@@ -212,8 +214,8 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Edit Worker</h3>
               <button onClick={() => setShowEditModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
