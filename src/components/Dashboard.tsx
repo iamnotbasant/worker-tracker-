@@ -1,6 +1,6 @@
-import { User, Check, Plus, X, Search, CheckCircle2, XCircle, Users, Banknote, UserPlus, CalendarDays, CheckSquare, RotateCcw, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Check, Plus, X, Search, CheckCircle2, XCircle, Users, UserPlus, CalendarDays, CheckSquare, RotateCcw } from 'lucide-react';
 import { Worker, AttendanceStatus, WorkerRole } from '../types';
-import { useState } from 'react';
 
 interface DashboardProps {
   workers: Worker[];
@@ -19,7 +19,6 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
   const [newName, setNewName] = useState('');
   const [newRole, setNewRole] = useState<WorkerRole>('Labour');
   const [newRate, setNewRate] = useState('');
-  const [newLocation, setNewLocation] = useState('Site Alpha');
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,8 +26,7 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
       onAddWorker({
         name: newName,
         role: newRole,
-        dailyRate: Number(newRate),
-        location: newLocation
+        dailyRate: Number(newRate)
       });
       setShowAddModal(false);
       setNewName('');
@@ -56,148 +54,129 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div className="space-y-1">
-          <p className="text-primary font-bold uppercase tracking-wider text-xs">Daily Attendance</p>
-          <h1 className="text-3xl md:text-4xl font-black dark:text-white">{today}</h1>
+          <div className="flex items-center gap-2">
+            <CalendarDays className="text-primary" size={20} />
+            <p className="text-primary font-bold uppercase tracking-wider text-[10px] md:text-xs">Daily Attendance</p>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black dark:text-white tracking-tight">{today}</h1>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowAddModal(true)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 md:py-2 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+        <div className="flex gap-3">
+          <button onClick={() => setShowAddModal(true)} className="hidden md:flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all active:scale-95">
             <UserPlus size={18} />
             Add Worker
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
-        <div className="flex flex-col gap-1 rounded-2xl p-4 md:p-5 bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-primary/10 shadow-sm">
-          <Users className="text-primary mb-1 md:mb-2" size={24} />
-          <p className="text-slate-500 dark:text-slate-400 text-[11px] md:text-xs font-bold uppercase tracking-wider">Total Workers</p>
-          <p className="text-2xl md:text-3xl font-black">{workers.length}</p>
-        </div>
-        <div className="flex flex-col gap-1 rounded-2xl p-4 md:p-5 bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-primary/10 shadow-sm">
-          <CheckCircle2 className="text-green-500 mb-1 md:mb-2" size={24} />
-          <p className="text-slate-500 dark:text-slate-400 text-[11px] md:text-xs font-bold uppercase tracking-wider">Present Today</p>
-          <p className="text-2xl md:text-3xl font-black text-green-500">{presentCount}</p>
-        </div>
-        <div className="flex flex-col gap-1 rounded-2xl p-4 md:p-5 bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-primary/10 shadow-sm">
-          <XCircle className="text-red-500 mb-1 md:mb-2" size={24} />
-          <p className="text-slate-500 dark:text-slate-400 text-[11px] md:text-xs font-bold uppercase tracking-wider">Absent Today</p>
-          <p className="text-2xl md:text-3xl font-black text-red-500">{absentCount}</p>
-        </div>
-        <div className="flex flex-col gap-1 rounded-2xl p-4 md:p-5 bg-primary text-white shadow-lg shadow-primary/20 col-span-2 lg:col-span-1">
-          <Banknote className="mb-1 md:mb-2" size={24} />
-          <p className="text-white/80 text-[11px] md:text-xs font-bold uppercase tracking-wider">Labour Cost</p>
-          <p className="text-2xl md:text-3xl font-black">₹{totalCost.toLocaleString()}</p>
+      {/* Search & Filters */}
+      <div className="mb-6">
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
+            <input 
+              className="w-full bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white text-sm md:text-base shadow-sm group-hover:border-slate-300 dark:group-hover:border-slate-600" 
+              placeholder="Search worker..." 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
+            {['All', 'Mistri', 'Labour', 'Helper'].map(filter => (
+              <button 
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm border transition-all active:scale-95 ${
+                  activeFilter === filter 
+                    ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white shadow-md' 
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Quick Actions Bar */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-6">
         <button 
           onClick={() => onMarkAll('Present')}
-          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-green-500/30 text-green-600 dark:text-green-500 font-bold hover:bg-green-500/10 transition-colors text-sm md:text-base"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-green-500/30 bg-green-50/50 dark:bg-green-900/10 text-green-600 dark:text-green-500 font-bold hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-xs md:text-sm active:scale-[0.98]"
         >
-          <CheckSquare size={20} />
-          Mark All
+          <CheckSquare size={16} />
+          Mark All Present
         </button>
         <button 
           onClick={onResetAll}
-          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-500/30 text-red-600 dark:text-red-500 font-bold hover:bg-red-500/10 transition-colors text-sm md:text-base"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-900/10 text-red-600 dark:text-red-500 font-bold hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-xs md:text-sm active:scale-[0.98]"
         >
-          <RotateCcw size={20} />
+          <RotateCcw size={16} />
           Reset All
         </button>
       </div>
 
-      {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input 
-            className="w-full bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-primary/20 rounded-2xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all dark:text-white text-base shadow-sm" 
-            placeholder="Search worker name or ID..." 
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {['All', 'Mistri', 'Labour', 'Helper'].map(filter => (
-            <button 
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={`whitespace-nowrap px-5 py-3 rounded-xl font-bold text-sm border transition-colors ${
-                activeFilter === filter 
-                  ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white' 
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Worker List */}
-      <div className="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-2 md:p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+      <div className="space-y-3 bg-slate-50/50 dark:bg-slate-900/20 p-2 md:p-4 rounded-2xl border border-slate-100 dark:border-slate-800/50">
         {filteredWorkers.map(worker => (
-          <div key={worker.id} className={`bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-primary/10 rounded-xl p-3 md:p-4 shadow-sm transition-opacity ${worker.currentStatus ? '' : 'opacity-70'}`}>
+          <div key={worker.id} className={`bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-primary/10 rounded-xl p-3 md:p-4 shadow-sm hover:shadow-md transition-all ${worker.currentStatus ? '' : 'opacity-90'}`}>
             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
               <div 
-                className="flex items-center gap-3 flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                className="flex items-center gap-3 flex-1 cursor-pointer active:opacity-70 transition-opacity"
                 onClick={() => onWorkerClick(worker)}
               >
-                <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
-                  <User size={24} className="md:w-7 md:h-7" />
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-slate-600">
+                  <User size={20} className="md:w-6 md:h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base md:text-lg dark:text-white leading-tight">{worker.name}</h3>
-                  <div className="flex gap-2 mt-1 items-center">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                      worker.role === 'Mistri' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' :
-                      worker.role === 'Labour' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
-                      'bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                  <h3 className="font-bold text-sm md:text-lg dark:text-white leading-tight">{worker.name}</h3>
+                  <div className="flex gap-2 mt-0.5 items-center">
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wide ${
+                      worker.role === 'Mistri' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                      worker.role === 'Labour' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                     }`}>
                       {worker.role}
                     </span>
-                    <span className="text-slate-500 dark:text-slate-400 text-xs md:text-sm font-medium">₹{worker.dailyRate} / Day</span>
+                    <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">₹{worker.dailyRate}/Day</span>
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-2 md:w-80">
+              <div className="grid grid-cols-3 gap-2 md:w-80 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-700">
                 <button 
                   onClick={() => onUpdateStatus(worker.id, 'Present')}
-                  className={`flex flex-col items-center justify-center gap-1 py-2 md:py-3 rounded-lg border transition-all ${
+                  className={`flex flex-col items-center justify-center gap-1 py-2 md:py-2.5 rounded-lg border transition-all active:scale-95 ${
                     worker.currentStatus === 'Present' 
-                      ? 'bg-green-500 border-green-500 text-white' 
-                      : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-primary/10 hover:border-green-500 dark:hover:border-green-500'
+                      ? 'bg-green-500 border-green-500 text-white shadow-md shadow-green-500/20' 
+                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-green-500 dark:hover:border-green-500 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <Check size={18} className="md:w-5 md:h-5" />
+                  <Check size={16} className="md:w-5 md:h-5" />
                   <span className="text-[10px] font-bold uppercase">Present</span>
                 </button>
                 <button 
                   onClick={() => onUpdateStatus(worker.id, 'Half day')}
-                  className={`flex flex-col items-center justify-center gap-1 py-2 md:py-3 rounded-lg border transition-all ${
+                  className={`flex flex-col items-center justify-center gap-1 py-2 md:py-2.5 rounded-lg border transition-all active:scale-95 ${
                     worker.currentStatus === 'Half day' 
-                      ? 'bg-yellow-500 border-yellow-500 text-black' 
-                      : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-primary/10 hover:border-yellow-500 dark:hover:border-yellow-500'
+                      ? 'bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/20' 
+                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-500 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <Plus size={18} className="md:w-5 md:h-5" />
+                  <Plus size={16} className="md:w-5 md:h-5 rotate-45" />
                   <span className="text-[10px] font-bold uppercase">Half Day</span>
                 </button>
                 <button 
                   onClick={() => onUpdateStatus(worker.id, 'Absent')}
-                  className={`flex flex-col items-center justify-center gap-1 py-2 md:py-3 rounded-lg border transition-all ${
+                  className={`flex flex-col items-center justify-center gap-1 py-2 md:py-2.5 rounded-lg border transition-all active:scale-95 ${
                     worker.currentStatus === 'Absent' 
-                      ? 'bg-red-500 border-red-500 text-white' 
-                      : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-primary/10 hover:border-red-500 dark:hover:border-red-500'
+                      ? 'bg-red-500 border-red-500 text-white shadow-md shadow-red-500/20' 
+                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <X size={18} className="md:w-5 md:h-5" />
+                  <X size={16} className="md:w-5 md:h-5" />
                   <span className="text-[10px] font-bold uppercase">Absent</span>
                 </button>
               </div>
@@ -238,10 +217,6 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
               <div>
                 <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Daily Rate (₹)</label>
                 <input type="number" value={newRate} onChange={(e) => setNewRate(e.target.value)} min="1" step="1" className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Location</label>
-                <input type="text" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white" required />
               </div>
               <button type="submit" className="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
                 Add Worker

@@ -18,7 +18,6 @@ export interface PaymentRecord {
 export interface Worker {
   id: string;
   name: string;
-  location: string;
   role: WorkerRole;
   dailyRate: number;
   currentStatus?: AttendanceStatus | null;

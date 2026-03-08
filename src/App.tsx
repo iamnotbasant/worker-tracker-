@@ -19,10 +19,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'attendance' | 'payments'>('attendance');
   
   const [workers, setWorkers] = useState<Worker[]>([
-    { id: '1', name: 'Ramesh Kumar', location: 'Site Alpha', role: 'Mistri', dailyRate: 850, currentStatus: 'Present' },
-    { id: '2', name: 'Sunil Yadav', location: 'Site Alpha', role: 'Labour', dailyRate: 650, currentStatus: 'Half day' },
-    { id: '3', name: 'Pooja Devi', location: 'Site Alpha', role: 'Helper', dailyRate: 450, currentStatus: 'Absent' },
-    { id: '4', name: 'Abdul Khan', location: 'Site Alpha', role: 'Labour', dailyRate: 650, currentStatus: null },
+    { id: '1', name: 'Ramesh Kumar', role: 'Mistri', dailyRate: 850, currentStatus: 'Present' },
+    { id: '2', name: 'Sunil Yadav', role: 'Labour', dailyRate: 650, currentStatus: 'Half day' },
+    { id: '3', name: 'Pooja Devi', role: 'Helper', dailyRate: 450, currentStatus: 'Absent' },
+    { id: '4', name: 'Abdul Khan', role: 'Labour', dailyRate: 650, currentStatus: null },
   ]);
 
   const [attendanceLog, setAttendanceLog] = useState<Record<string, AttendanceRecord[]>>({
@@ -56,10 +56,6 @@ export default function App() {
   const handleWorkerClick = (worker: Worker) => {
     setSelectedWorkerId(worker.id);
     setCurrentView('worker');
-  };
-
-  const handleUpdateDailyRate = (workerId: string, newRate: number) => {
-    setWorkers(workers.map(w => w.id === workerId ? { ...w, dailyRate: newRate } : w));
   };
 
   const handleAddWorker = (workerData: Omit<Worker, 'id' | 'currentStatus'>) => {
@@ -118,6 +114,34 @@ export default function App() {
     }
   };
 
+  const handleEditAttendance = (workerId: string, recordId: string, updates: Partial<AttendanceRecord>) => {
+    setAttendanceLog({
+      ...attendanceLog,
+      [workerId]: attendanceLog[workerId].map(log => log.id === recordId ? { ...log, ...updates } : log)
+    });
+  };
+
+  const handleDeleteAttendance = (workerId: string, recordId: string) => {
+    setAttendanceLog({
+      ...attendanceLog,
+      [workerId]: attendanceLog[workerId].filter(log => log.id !== recordId)
+    });
+  };
+
+  const handleEditPayment = (workerId: string, recordId: string, updates: Partial<PaymentRecord>) => {
+    setPayments({
+      ...payments,
+      [workerId]: payments[workerId].map(p => p.id === recordId ? { ...p, ...updates } : p)
+    });
+  };
+
+  const handleDeletePayment = (workerId: string, recordId: string) => {
+    setPayments({
+      ...payments,
+      [workerId]: payments[workerId].filter(p => p.id !== recordId)
+    });
+  };
+
   const handleAddPayment = (description: string, amount: number, dateStr?: string) => {
     if (!selectedWorkerId) return;
     const dateToUse = dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -154,15 +178,27 @@ export default function App() {
                   worker={selectedWorker} 
                   onMarkAttendance={handleMarkAttendance} 
                   onAddPayment={handleAddPayment}
-                  onUpdateDailyRate={handleUpdateDailyRate}
                   onEditWorker={handleEditWorker}
                   onDeleteWorker={handleDeleteWorker}
                 />
                 <Summary attendanceLog={workerAttendance} payments={workerPayments} />
                 <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
                 
-                {activeTab === 'attendance' && <AttendanceTable logs={workerAttendance} />}
-                {activeTab === 'payments' && <PaymentsTable payments={workerPayments} onAddPayment={handleAddPayment} />}
+                {activeTab === 'attendance' && (
+                  <AttendanceTable 
+                    logs={workerAttendance} 
+                    onEdit={(recordId, updates) => handleEditAttendance(selectedWorker.id, recordId, updates)}
+                    onDelete={(recordId) => handleDeleteAttendance(selectedWorker.id, recordId)}
+                  />
+                )}
+                {activeTab === 'payments' && (
+                  <PaymentsTable 
+                    payments={workerPayments} 
+                    onAddPayment={handleAddPayment} 
+                    onEdit={(recordId, updates) => handleEditPayment(selectedWorker.id, recordId, updates)}
+                    onDelete={(recordId) => handleDeletePayment(selectedWorker.id, recordId)}
+                  />
+                )}
               </div>
             ) : (
               <div className="text-center py-20 text-slate-500">

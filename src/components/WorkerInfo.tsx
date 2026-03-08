@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { User, MapPin, Plus, X, Banknote, Calendar, Edit2, Trash2 } from 'lucide-react';
+import { User, Plus, X, Banknote, Calendar, Edit2, Trash2 } from 'lucide-react';
 import { Worker, WorkerRole } from '../types';
 
 interface WorkerInfoProps {
   worker: Worker;
   onMarkAttendance: (status: 'Present' | 'Half day' | 'Absent', date: string) => void;
   onAddPayment: (description: string, amount: number, date: string) => void;
-  onUpdateDailyRate: (workerId: string, newRate: number) => void;
   onEditWorker: (workerId: string, updates: Partial<Worker>) => void;
   onDeleteWorker: (workerId: string) => void;
 }
 
-export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onUpdateDailyRate, onEditWorker, onDeleteWorker }: WorkerInfoProps) {
+export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorker, onDeleteWorker }: WorkerInfoProps) {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showEditRateModal, setShowEditRateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
@@ -23,17 +21,14 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onUpdateDai
   const [paymentDescription, setPaymentDescription] = useState('');
   const [paymentAmount, setPaymentAmount] = useState('');
 
-  const [newRate, setNewRate] = useState(worker.dailyRate.toString());
-  
   const [editName, setEditName] = useState(worker.name);
   const [editRole, setEditRole] = useState<WorkerRole>(worker.role);
-  const [editLocation, setEditLocation] = useState(worker.location);
+  const [editRate, setEditRate] = useState(worker.dailyRate.toString());
 
   useEffect(() => {
     setEditName(worker.name);
     setEditRole(worker.role);
-    setEditLocation(worker.location);
-    setNewRate(worker.dailyRate.toString());
+    setEditRate(worker.dailyRate.toString());
   }, [worker]);
 
   const handleMark = (status: 'Present' | 'Half day' | 'Absent') => {
@@ -54,26 +49,13 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onUpdateDai
     }
   };
 
-  const handleEditRateSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const rate = Number(newRate);
-    if (!isNaN(rate) && rate > 0) {
-      if (window.confirm(`Are you sure you want to update the daily rate to ₹${rate}?`)) {
-        onUpdateDailyRate(worker.id, rate);
-        setShowEditRateModal(false);
-      }
-    } else {
-      alert("Please enter a valid amount.");
-    }
-  };
-
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editName) {
+    if (editName && editRate && !isNaN(Number(editRate))) {
       onEditWorker(worker.id, {
         name: editName,
         role: editRole,
-        location: editLocation
+        dailyRate: Number(editRate)
       });
       setShowEditModal(false);
     }
@@ -87,55 +69,45 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onUpdateDai
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <div className="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shrink-0">
-            <User size={28} />
+      <div className="bg-white dark:bg-slate-800/50 p-4 md:p-6 rounded-2xl border border-slate-200/60 dark:border-primary/10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
+        <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
+          <div className="size-12 md:size-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shrink-0 shadow-sm">
+            <User size={24} className="md:w-7 md:h-7" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
+          <div className="flex-1">
+            <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2 dark:text-white">
               {worker.name}
               <button onClick={() => setShowEditModal(true)} className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Edit Worker">
                 <Edit2 size={16} />
               </button>
-              <button onClick={handleDelete} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete Worker">
-                <Trash2 size={16} />
-              </button>
             </h1>
             <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
-              <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1 text-sm">
-                <MapPin size={14} />
-                {worker.location}
-              </p>
               {worker.role && (
-                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                  worker.role === 'Mistri' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' :
-                  worker.role === 'Labour' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
-                  'bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide ${
+                  worker.role === 'Mistri' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                  worker.role === 'Labour' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                  'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                 }`}>
                   {worker.role}
                 </span>
               )}
-              <span className="text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center gap-1">
+              <span className="text-slate-500 dark:text-slate-400 text-xs md:text-sm font-medium flex items-center gap-1">
                 ₹{worker.dailyRate} / Day
-                <button onClick={() => setShowEditRateModal(true)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors text-primary" title="Edit Daily Rate">
-                  <Edit2 size={12} />
-                </button>
               </span>
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+        <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
           <button 
             onClick={() => setShowPaymentModal(true)}
-            className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors active:scale-95 border border-slate-200 dark:border-slate-700"
           >
             <Banknote size={18} />
             Add Payment
           </button>
           <button 
             onClick={() => setShowAttendanceModal(true)}
-            className="bg-primary text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors"
+            className="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors active:scale-95"
           >
             <Plus size={18} />
             Mark Attendance
@@ -239,37 +211,6 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onUpdateDai
         </div>
       )}
 
-      {showEditRateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Edit Daily Rate</h3>
-              <button onClick={() => setShowEditRateModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
-                <X size={20} />
-              </button>
-            </div>
-            <form onSubmit={handleEditRateSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">New Daily Rate (₹)</label>
-                <input 
-                  type="number" 
-                  value={newRate}
-                  onChange={(e) => setNewRate(e.target.value)}
-                  placeholder="0.00"
-                  min="1"
-                  step="0.01"
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
-                  required
-                />
-              </div>
-              <button type="submit" className="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
-                Update Rate
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       {showEditModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-sm shadow-xl border border-primary/10">
@@ -293,12 +234,18 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onUpdateDai
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Location</label>
-                <input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white" required />
+                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Daily Rate (₹)</label>
+                <input type="number" value={editRate} onChange={(e) => setEditRate(e.target.value)} min="1" step="1" className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white" required />
               </div>
-              <button type="submit" className="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
-                Save Changes
-              </button>
+              <div className="pt-2 flex gap-3">
+                <button type="button" onClick={handleDelete} className="flex-1 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg font-bold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2">
+                  <Trash2 size={18} />
+                  Delete
+                </button>
+                <button type="submit" className="flex-[2] py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                  Save Changes
+                </button>
+              </div>
             </form>
           </div>
         </div>

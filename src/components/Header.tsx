@@ -28,13 +28,7 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-primary/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 md:px-10 py-3 transition-colors duration-300">
       <div className="flex items-center gap-2 md:gap-3">
-        <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-lg bg-primary text-white">
-          <HardHat size={16} className="md:w-5 md:h-5" />
-        </div>
-        <div className="hidden sm:block">
-          <h2 className="text-slate-900 dark:text-slate-100 text-base md:text-lg font-bold leading-tight">Site Alpha</h2>
-          <p className="text-[10px] md:text-xs text-slate-500 dark:text-primary/70 font-medium whitespace-nowrap">Mumbai Sector 4</p>
-        </div>
+        {/* Logo and Site Name removed as requested */}
       </div>
 
       <div className="flex items-center gap-1 md:gap-2 mx-auto">
