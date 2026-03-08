@@ -34,19 +34,16 @@ export default function App() {
 
   // Save workers whenever they change
   useEffect(() => {
-    console.log("[v0] Workers changed, saving to localStorage:", workers);
     storage.saveWorkers(workers);
   }, [workers]);
 
   // Save attendance log whenever it changes
   useEffect(() => {
-    console.log("[v0] Attendance log changed, saving to localStorage:", attendanceLog);
     storage.saveAttendanceLog(attendanceLog);
   }, [attendanceLog]);
 
   // Save payments whenever they change
   useEffect(() => {
-    console.log("[v0] Payments changed, saving to localStorage:", payments);
     storage.savePayments(payments);
   }, [payments]);
 
@@ -103,9 +100,6 @@ export default function App() {
     
     const dateToUse = dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    console.log("[v0] Marking attendance - WorkerId:", selectedWorkerId, "Date:", dateToUse, "Status:", status);
-    console.log("[v0] Current attendance for worker:", workerAttendance);
-    
     if (workerAttendance.some(log => log.date === dateToUse)) {
       alert(`Attendance already marked for ${dateToUse}!`);
       return;
@@ -121,15 +115,12 @@ export default function App() {
       status,
       pay
     };
-
-    console.log("[v0] New record created:", newRecord);
     
     const updatedLog = {
       ...attendanceLog,
       [selectedWorkerId]: [newRecord, ...workerAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     };
     
-    console.log("[v0] Updated attendance log:", updatedLog);
     setAttendanceLog(updatedLog);
     
     // Also update current status on dashboard if the date is today
