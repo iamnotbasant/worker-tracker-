@@ -38,6 +38,7 @@ export const getAttendanceLog = (): Record<string, AttendanceRecord[]> => {
 
 export const saveAttendanceLog = (log: Record<string, AttendanceRecord[]>): void => {
   try {
+    console.log("[v0] Saving attendance log to localStorage:", log);
     localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(log));
   } catch (error) {
     console.error('Error saving attendance to storage:', error);
