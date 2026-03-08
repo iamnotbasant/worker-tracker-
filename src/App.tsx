@@ -49,6 +49,38 @@ export default function App() {
 
   const handleUpdateStatus = (workerId: string, status: AttendanceStatus | null) => {
     setWorkers(workers.map(w => w.id === workerId ? { ...w, currentStatus: status } : w));
+    
+    // Also add to attendance log if status is being set
+    if (status) {
+      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const worker = workers.find(w => w.id === workerId);
+      
+      if (worker) {
+        // Check if attendance already marked for today
+        const existingLog = attendanceLog[workerId];
+        if (existingLog && existingLog.some(log => log.date === today)) {
+          return; // Already marked for today
+        }
+        
+        let pay = 0;
+        if (status === 'Present') pay = worker.dailyRate;
+        if (status === 'Half day') pay = worker.dailyRate / 2;
+        
+        const newRecord: AttendanceRecord = {
+          id: Date.now().toString(),
+          date: today,
+          status,
+          pay
+        };
+        
+        const updatedLog = {
+          ...attendanceLog,
+          [workerId]: [newRecord, ...(attendanceLog[workerId] || [])].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        };
+        
+        setAttendanceLog(updatedLog);
+      }
+    }
   };
 
   const handleMarkAll = (status: AttendanceStatus) => {
