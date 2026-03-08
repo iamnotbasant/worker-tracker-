@@ -119,38 +119,38 @@ export function PaymentsTable({ payments, onAddPayment, onEdit, onDelete }: Paym
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Add Payment</h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">Add Payment</h3>
+              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                 <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Date</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Date</label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
                     type="date" 
                     value={paymentDate}
                     onChange={(e) => setPaymentDate(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                    className="w-full pl-11 pr-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                     required
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Description (Optional)</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Description (Optional)</label>
                 <input 
                   type="text" 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g., Weekly Advance"
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Amount (₹)</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Amount (₹)</label>
                 <input 
                   type="number" 
                   value={amount}
@@ -158,11 +158,11 @@ export function PaymentsTable({ payments, onAddPayment, onEdit, onDelete }: Paym
                   placeholder="0.00"
                   min="1"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                   required
                 />
               </div>
-              <button type="submit" className="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
+              <button type="submit" className="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 active:scale-95">
                 Save Payment
               </button>
             </form>
@@ -173,48 +173,51 @@ export function PaymentsTable({ payments, onAddPayment, onEdit, onDelete }: Paym
       {editingPayment && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Edit Payment</h3>
-              <button onClick={() => setEditingPayment(null)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">Edit Payment</h3>
+              <button onClick={() => setEditingPayment(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                 <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleEditSave} className="space-y-4">
+            <form onSubmit={handleEditSave} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Date</label>
-                <input 
-                  type="date" 
-                  value={editDate}
-                  onChange={(e) => setEditDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
-                  required
-                />
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Date</label>
+                <div className="relative">
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input 
+                    type="date" 
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="w-full pl-11 pr-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
+                    required
+                  />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Description</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Description</label>
                 <input 
                   type="text" 
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Amount (₹)</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Amount (₹)</label>
                 <input 
                   type="number" 
                   value={editAmount}
                   onChange={(e) => setEditAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                   required
                 />
               </div>
-              <div className="pt-2 flex gap-3">
-                <button type="button" onClick={handleDelete} className="flex-1 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg font-bold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2">
+              <div className="pt-3 flex gap-3">
+                <button type="button" onClick={handleDelete} className="flex-1 py-2.5 bg-red-100 dark:bg-red-900/25 text-red-700 dark:text-red-400 rounded-xl font-semibold border border-red-200 dark:border-red-900/50 hover:bg-red-200 dark:hover:bg-red-900/35 transition-all duration-200 flex items-center justify-center gap-2">
                   <Trash2 size={18} />
                   Delete
                 </button>
-                <button type="submit" className="flex-[2] py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                <button type="submit" className="flex-[2] py-2.5 bg-primary text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 active:scale-95">
                   Save Changes
                 </button>
               </div>

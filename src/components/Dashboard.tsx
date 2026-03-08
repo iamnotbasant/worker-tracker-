@@ -198,30 +198,30 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Add New Worker</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">Add New Worker</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                 <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleAddSubmit} className="space-y-4">
+            <form onSubmit={handleAddSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Full Name</label>
-                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white" required />
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Full Name</label>
+                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all" placeholder="Enter full name" required />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Role</label>
-                <select value={newRole} onChange={(e) => setNewRole(e.target.value as WorkerRole)} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white">
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Role</label>
+                <select value={newRole} onChange={(e) => setNewRole(e.target.value as WorkerRole)} className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all">
                   <option value="Mistri">Mistri</option>
                   <option value="Labour">Labour</option>
                   <option value="Helper">Helper</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Daily Rate (₹)</label>
-                <input type="number" value={newRate} onChange={(e) => setNewRate(e.target.value)} min="1" step="1" className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white" required />
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Daily Rate (₹)</label>
+                <input type="number" value={newRate} onChange={(e) => setNewRate(e.target.value)} min="1" step="1" className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all" placeholder="0" required />
               </div>
-              <button type="submit" className="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
+              <button type="submit" className="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 active:scale-95">
                 Add Worker
               </button>
             </form>

@@ -107,29 +107,29 @@ export function AttendanceTable({ logs, onEdit, onDelete }: AttendanceTableProps
       {editingLog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border-light dark:border-border-dark">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Edit Attendance</h3>
-              <button onClick={() => setEditingLog(null)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">Edit Attendance</h3>
+              <button onClick={() => setEditingLog(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                 <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleSave} className="space-y-4">
+            <form onSubmit={handleSave} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Date</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Date</label>
                 <input 
                   type="date" 
                   value={editDate}
                   onChange={(e) => setEditDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Status</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Status</label>
                 <select 
                   value={editStatus} 
                   onChange={(e) => setEditStatus(e.target.value as AttendanceStatus)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                 >
                   <option value="Present">Present</option>
                   <option value="Half day">Half day</option>
@@ -137,21 +137,21 @@ export function AttendanceTable({ logs, onEdit, onDelete }: AttendanceTableProps
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Pay Amount (₹)</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-900 dark:text-white">Pay Amount (₹)</label>
                 <input 
                   type="number" 
                   value={editPay}
                   onChange={(e) => setEditPay(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white"
+                  className="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:text-white transition-all"
                   required
                 />
               </div>
-              <div className="pt-2 flex gap-3">
-                <button type="button" onClick={handleDelete} className="flex-1 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg font-bold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2">
+              <div className="pt-3 flex gap-3">
+                <button type="button" onClick={handleDelete} className="flex-1 py-2.5 bg-red-100 dark:bg-red-900/25 text-red-700 dark:text-red-400 rounded-xl font-semibold border border-red-200 dark:border-red-900/50 hover:bg-red-200 dark:hover:bg-red-900/35 transition-all duration-200 flex items-center justify-center gap-2">
                   <Trash2 size={18} />
                   Delete
                 </button>
-                <button type="submit" className="flex-[2] py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                <button type="submit" className="flex-[2] py-2.5 bg-primary text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 active:scale-95">
                   Save Changes
                 </button>
               </div>
