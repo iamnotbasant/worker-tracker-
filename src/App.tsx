@@ -96,9 +96,13 @@ export default function App() {
   const workerPayments = selectedWorkerId && payments[selectedWorkerId] ? payments[selectedWorkerId] : [];
 
   const handleMarkAttendance = (status: AttendanceStatus, dateStr?: string) => {
+    console.log("[v0] handleMarkAttendance called:", { status, dateStr, selectedWorkerId, selectedWorker });
     if (!selectedWorkerId || !selectedWorker) return;
     
     const dateToUse = dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    console.log("[v0] Checking existing attendance for date:", dateToUse);
+    console.log("[v0] Current workerAttendance:", workerAttendance);
     
     if (workerAttendance.some(log => log.date === dateToUse)) {
       alert(`Attendance already marked for ${dateToUse}!`);
@@ -116,11 +120,14 @@ export default function App() {
       pay
     };
     
+    console.log("[v0] New record created:", newRecord);
+    
     const updatedLog = {
       ...attendanceLog,
       [selectedWorkerId]: [newRecord, ...workerAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     };
     
+    console.log("[v0] Updated attendance log:", updatedLog);
     setAttendanceLog(updatedLog);
     
     // Also update current status on dashboard if the date is today

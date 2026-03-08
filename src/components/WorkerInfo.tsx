@@ -34,6 +34,7 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
   const handleMark = (status: 'Present' | 'Half day' | 'Absent') => {
     // Format date to match existing format 'Oct 27, 2023'
     const formattedDate = new Date(attendanceDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    console.log("[v0] Marking attendance:", { status, formattedDate });
     onMarkAttendance(status, formattedDate);
     setShowAttendanceModal(false);
   };
