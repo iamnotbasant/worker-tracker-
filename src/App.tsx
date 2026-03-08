@@ -48,6 +48,7 @@ export default function App() {
   }, [payments]);
 
   const handleUpdateStatus = (workerId: string, status: AttendanceStatus | null) => {
+    console.log("[v0] handleUpdateStatus called with:", { workerId, status, attendanceLog });
     setWorkers(workers.map(w => w.id === workerId ? { ...w, currentStatus: status } : w));
     
     // Also add to attendance log if status is being set
@@ -55,10 +56,19 @@ export default function App() {
       const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const worker = workers.find(w => w.id === workerId);
       
+      console.log("[v0] Today:", today);
+      console.log("[v0] Worker found:", worker);
+      console.log("[v0] Current attendance log for worker:", attendanceLog[workerId]);
+      
       if (worker) {
         // Check if attendance already marked for today
-        const existingLog = attendanceLog[workerId];
-        if (existingLog && existingLog.some(log => log.date === today)) {
+        const existingLog = attendanceLog[workerId] || [];
+        const alreadyMarked = existingLog.some(log => log.date === today);
+        
+        console.log("[v0] Already marked today?", alreadyMarked);
+        
+        if (alreadyMarked) {
+          console.log("[v0] Attendance already marked for today, returning");
           return; // Already marked for today
         }
         
@@ -73,11 +83,14 @@ export default function App() {
           pay
         };
         
+        console.log("[v0] Creating new record:", newRecord);
+        
         const updatedLog = {
           ...attendanceLog,
           [workerId]: [newRecord, ...(attendanceLog[workerId] || [])].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         };
         
+        console.log("[v0] Updated attendance log:", updatedLog);
         setAttendanceLog(updatedLog);
       }
     }
