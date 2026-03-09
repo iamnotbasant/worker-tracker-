@@ -139,10 +139,10 @@ export default function App() {
       return;
     }
 
-        let pay = 0;
-        if (status === 'Present') pay = worker.dailyRate;
-        
-        const newRecord: AttendanceRecord = {
+    let pay = 0;
+    if (status === 'Present') pay = selectedWorker.dailyRate;
+    
+    const newRecord: AttendanceRecord = {
       id: Date.now().toString(),
       date: dateToUse,
       status,
