@@ -39,6 +39,7 @@ export default function App() {
 
   // Save attendance log whenever it changes
   useEffect(() => {
+    console.log("[v0] Saving attendance log to localStorage:", attendanceLog);
     storage.saveAttendanceLog(attendanceLog);
   }, [attendanceLog]);
 
