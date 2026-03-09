@@ -4,7 +4,7 @@ import { Worker, WorkerRole } from '../types';
 
 interface WorkerInfoProps {
   worker: Worker;
-  onMarkAttendance: (status: 'Present' | 'Half day' | 'Absent', date: string) => void;
+  onMarkAttendance: (status: 'Present' | 'Absent', date: string) => void;
   onAddPayment: (description: string, amount: number, date: string) => void;
   onEditWorker: (workerId: string, updates: Partial<Worker>) => void;
   onDeleteWorker: (workerId: string) => void;
@@ -31,7 +31,7 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
     setEditRate(worker.dailyRate.toString());
   }, [worker]);
 
-  const handleMark = (status: 'Present' | 'Half day' | 'Absent') => {
+  const handleMark = (status: 'Present' | 'Absent') => {
     // Format date to match existing format 'Oct 27, 2023'
     const formattedDate = new Date(attendanceDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     onMarkAttendance(status, formattedDate);
@@ -144,11 +144,7 @@ export function WorkerInfo({ worker, onMarkAttendance, onAddPayment, onEditWorke
             <div className="space-y-3">
               <button onClick={() => handleMark('Present')} className="w-full py-3 px-4 bg-green-100 dark:bg-green-900/25 text-green-700 dark:text-green-400 rounded-xl font-semibold flex items-center justify-center gap-2 border border-green-200 dark:border-green-900/50 hover:bg-green-200 dark:hover:bg-green-900/35 transition-all duration-200">
                 <span className="size-2.5 bg-green-500 rounded-full"></span>
-                Present (Full Day)
-              </button>
-              <button onClick={() => handleMark('Half day')} className="w-full py-3 px-4 bg-amber-100 dark:bg-amber-900/25 text-amber-700 dark:text-amber-400 rounded-xl font-semibold flex items-center justify-center gap-2 border border-amber-200 dark:border-amber-900/50 hover:bg-amber-200 dark:hover:bg-amber-900/35 transition-all duration-200">
-                <span className="size-2.5 bg-amber-500 rounded-full"></span>
-                Half Day
+                Present
               </button>
               <button onClick={() => handleMark('Absent')} className="w-full py-3 px-4 bg-red-100 dark:bg-red-900/25 text-red-700 dark:text-red-400 rounded-xl font-semibold flex items-center justify-center gap-2 border border-red-200 dark:border-red-900/50 hover:bg-red-200 dark:hover:bg-red-900/35 transition-all duration-200">
                 <span className="size-2.5 bg-red-500 rounded-full"></span>
