@@ -148,7 +148,7 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 md:w-80 pt-3 md:pt-0 border-t md:border-t-0 border-border-light dark:border-border-dark">
+              <div className="grid grid-cols-2 gap-3 md:w-64 pt-3 md:pt-0 border-t md:border-t-0 border-border-light dark:border-border-dark">
                 <button 
                   onClick={() => onUpdateStatus(worker.id, 'Present')}
                   className={`flex flex-col items-center justify-center gap-1.5 py-3 md:py-3 rounded-lg border-2 font-semibold transition-all duration-200 active:scale-95 ${
@@ -159,17 +159,6 @@ export function Dashboard({ workers, onUpdateStatus, onMarkAll, onResetAll, onWo
                 >
                   <Check size={18} className="md:w-5 md:h-5" />
                   <span className="text-[9px] font-black uppercase tracking-wider">Present</span>
-                </button>
-                <button 
-                  onClick={() => onUpdateStatus(worker.id, 'Half day')}
-                  className={`flex flex-col items-center justify-center gap-1.5 py-3 md:py-3 rounded-lg border-2 font-semibold transition-all duration-200 active:scale-95 ${
-                    worker.currentStatus === 'Half day' 
-                      ? 'bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/25' 
-                      : 'bg-white dark:bg-surface-dark border-amber-200 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/15'
-                  }`}
-                >
-                  <Plus size={18} className="md:w-5 md:h-5 rotate-45" />
-                  <span className="text-[9px] font-black uppercase tracking-wider">Half</span>
                 </button>
                 <button 
                   onClick={() => onUpdateStatus(worker.id, 'Absent')}

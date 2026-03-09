@@ -34,24 +34,55 @@ export default function App() {
 
   // Save workers whenever they change
   useEffect(() => {
-    console.log("[v0] Workers changed, saving to localStorage:", workers);
     storage.saveWorkers(workers);
   }, [workers]);
 
   // Save attendance log whenever it changes
   useEffect(() => {
-    console.log("[v0] Attendance log changed, saving to localStorage:", attendanceLog);
+    console.log("[v0] Saving attendance log to localStorage:", attendanceLog);
     storage.saveAttendanceLog(attendanceLog);
   }, [attendanceLog]);
 
   // Save payments whenever they change
   useEffect(() => {
-    console.log("[v0] Payments changed, saving to localStorage:", payments);
     storage.savePayments(payments);
   }, [payments]);
 
   const handleUpdateStatus = (workerId: string, status: AttendanceStatus | null) => {
     setWorkers(workers.map(w => w.id === workerId ? { ...w, currentStatus: status } : w));
+    
+    // Also add to attendance log if status is being set
+    if (status) {
+      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const worker = workers.find(w => w.id === workerId);
+      
+      if (worker) {
+        // Check if attendance already marked for today
+        const existingLog = attendanceLog[workerId] || [];
+        const alreadyMarked = existingLog.some(log => log.date === today);
+        
+        if (alreadyMarked) {
+          return; // Already marked for today
+        }
+        
+        let pay = 0;
+        if (status === 'Present') pay = worker.dailyRate;
+        
+        const newRecord: AttendanceRecord = {
+          id: Date.now().toString(),
+          date: today,
+          status,
+          pay
+        };
+        
+        const updatedLog = {
+          ...attendanceLog,
+          [workerId]: [newRecord, ...(attendanceLog[workerId] || [])].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        };
+        
+        setAttendanceLog(updatedLog);
+      }
+    }
   };
 
   const handleMarkAll = (status: AttendanceStatus) => {
@@ -95,41 +126,34 @@ export default function App() {
   };
 
   const selectedWorker = workers.find(w => w.id === selectedWorkerId);
-  const workerAttendance = selectedWorkerId && attendanceLog[selectedWorkerId] ? attendanceLog[selectedWorkerId] : [];
-  const workerPayments = selectedWorkerId && payments[selectedWorkerId] ? payments[selectedWorkerId] : [];
+  const workerAttendance = selectedWorkerId ? (attendanceLog[selectedWorkerId] || []) : [];
+  const workerPayments = selectedWorkerId ? (payments[selectedWorkerId] || []) : [];
 
   const handleMarkAttendance = (status: AttendanceStatus, dateStr?: string) => {
     if (!selectedWorkerId || !selectedWorker) return;
     
     const dateToUse = dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    console.log("[v0] Marking attendance - WorkerId:", selectedWorkerId, "Date:", dateToUse, "Status:", status);
-    console.log("[v0] Current attendance for worker:", workerAttendance);
-    
     if (workerAttendance.some(log => log.date === dateToUse)) {
       alert(`Attendance already marked for ${dateToUse}!`);
       return;
     }
 
-    let pay = 0;
-    if (status === 'Present') pay = selectedWorker.dailyRate;
-    if (status === 'Half day') pay = selectedWorker.dailyRate / 2;
-
-    const newRecord: AttendanceRecord = {
+        let pay = 0;
+        if (status === 'Present') pay = worker.dailyRate;
+        
+        const newRecord: AttendanceRecord = {
       id: Date.now().toString(),
       date: dateToUse,
       status,
       pay
     };
-
-    console.log("[v0] New record created:", newRecord);
     
     const updatedLog = {
       ...attendanceLog,
       [selectedWorkerId]: [newRecord, ...workerAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     };
     
-    console.log("[v0] Updated attendance log:", updatedLog);
     setAttendanceLog(updatedLog);
     
     // Also update current status on dashboard if the date is today
